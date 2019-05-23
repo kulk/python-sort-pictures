@@ -6,9 +6,6 @@ class Operation:
 
 	pics_dir = os.getcwd() + "\pics" # Create the pics folder location
 	pics_list = os.listdir(pics_dir)
-	
-	def __init__(self):
-		self.file_list = []
 
 	def findYear(self, file_name):
 		year = re.findall(r'[IV][MI][GD]_\d\d\d\d', file_name)
@@ -34,14 +31,16 @@ class Operation:
 
 	def monthExists(self, year, month):
 		month_exsists = os.path.isdir(self.pics_dir + "\\" + year + "\\" + month)
+		dest_dir = self.pics_dir + "\\" + year + "\\" + month
 		if month_exsists is False:
-			os.mkdir(self.pics_dir + "\\" + year + "\\" + month)
+			os.mkdir(dest_dir)
+		return dest_dir
 
-	def move_file(self, fileName, year, month):
-		copyfile(self.pics_dir + "\\" + fileName, self.pics_dir + "\\" + year + "\\" + month + "\\" + fileName )
+	def move_file(self, fileName, dest_dir):
+		copyfile(self.pics_dir + "\\" + fileName, dest_dir + "\\" + fileName )
 		print("File %s has been copied" % fileName)
 
-	def engine(self):		
+	def run(self):		
 		for fileName in self.pics_list: #Loop trough pics_list		
 			file_type = self.findFileType(fileName) #Check if file type is jpg or .mp4
 
@@ -49,12 +48,10 @@ class Operation:
 				year = self.findYear(fileName) #Find year and month
 				month = self.findMonth(fileName)
 				self.yearExists(year) 
-				self.monthExists(year, month) #Create month folder if does not exist
-				self.move_file(fileName, year, month) #Move file to new folder
+				dest_dir = self.monthExists(year, month) #Create month folder if does not exist
+				self.move_file(fileName, dest_dir) #Move file to new folder
 
-x = Operation()
-x.engine()
-
-
+if __name__ == "__main__":
+    Operation().run()
 
 
