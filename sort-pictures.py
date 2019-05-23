@@ -1,13 +1,6 @@
 import re
 import os
-import shutil
-
-class Collection:
-
-	def __init__(self, file_name, year, month):
-		self.file_name = file_name
-		self.year = year
-		self.month = month
+from shutil import copyfile
 
 class Operation:
 
@@ -18,74 +11,50 @@ class Operation:
 		self.file_list = []
 
 	def findYear(self, file_name):
-		year = re.findall(r'IMG_\d\d\d\d', file_name)
-		year = year[0].replace('IMG_', '')
-		return year
+		year = re.findall(r'[IV][MI][GD]_\d\d\d\d', file_name)
+		if year:
+			year = re.sub(r'[IV][MI][GD]_', '', year[0])
+			return year
 
 	def findMonth(self, file_name):
-		month = re.findall(r'IMG_\d\d\d\d\d\d', file_name)
-		month = re.sub('IMG_\d\d\d\d', '', month[0])
-		return month
+		month = re.findall(r'[IV][MI][GD]_\d\d\d\d\d\d', file_name)
+		if month:
+			month = re.sub(r'[IV][MI][GD]_\d\d\d\d', '', month[0])
+			return month
 
 	def findFileType(self, file_name):
 		file_type = re.findall(r'\.\w+\Z', file_name)
-		return file_type
+		if file_type:
+			return file_type[0]
 
-	def yearExists():
+	def yearExists(self, year):
+		year_exsists = os.path.isdir(self.pics_dir + "\\" + year)
+		if year_exsists is False:
+			os.mkdir(self.pics_dir + "\\" + year)
 
-	def monthExists():
-		pass
+	def monthExists(self, year, month):
+		month_exsists = os.path.isdir(self.pics_dir + "\\" + year + "\\" + month)
+		if month_exsists is False:
+			os.mkdir(self.pics_dir + "\\" + year + "\\" + month)
 
-	def move_file():
-		pass
+	def move_file(self, fileName, year, month):
+		copyfile(self.pics_dir + "\\" + fileName, self.pics_dir + "\\" + year + "\\" + month + "\\" + fileName )
+		print("File %s has been copied" % fileName)
 
-	def engine(self, pics_list):
-		pass
-		#Check if pics_dir exists
+	def engine(self):		
+		for fileName in self.pics_list: #Loop trough pics_list		
+			file_type = self.findFileType(fileName) #Check if file type is jpg or .mp4
 
-		#Loop trough pics_list
-
-		#Check the file type
-
-		#Go to next item if file is not .jpg or .mp4
-
-		#Find year and month
-
-		#Check if year folder exists, if not create one (method)
-
-		#Check if month folder exists, if not create one (method)
-
-		#Move file to new folder (method)
-
-'''
-	def isJpg(self, file_name):
-		#Don't need this
-		jpg = re.search('.jpg', file_name)
-		if(jpg):
-			is_jpg =  True
-		else:
-			is_jpg = False
-		return is_jpg
-
-	def addToCollectionList(self, file_name):
-		# Why do I need this?
-		year = self.findYear(file_name)
-		month = self.findMonth(file_name)
-		new_collection = Collection(file_name, year, month)
-		self.file_list.append(new_collection)
-'''
+			if file_type == ".jpg" or file_type == ".mp4":
+				year = self.findYear(fileName) #Find year and month
+				month = self.findMonth(fileName)
+				self.yearExists(year) 
+				self.monthExists(year, month) #Create month folder if does not exist
+				self.move_file(fileName, year, month) #Move file to new folder
 
 x = Operation()
-x.engine(x.pics_list)
+x.engine()
 
 
-'''
-pics_dir = os.getcwd() + "\pics"
 
-test_folder = pics_dir + "\\test"
-test_file = pics_dir + "\IMG_20170713_134922359.txt"
-print(test_file)
-print(test_folder)
 
-shutil.copy(test_file, test_folder)
-'''
